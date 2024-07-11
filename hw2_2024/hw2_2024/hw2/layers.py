@@ -80,9 +80,9 @@ class LeakyReLU(Layer):
         :return: LeakyReLU of each sample in x.
         """
 
-        # TODO: Implement the LeakyReLU operation.
+        # Implement the LeakyReLU operation.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        out = torch.max(self.alpha * x, x)
         # ========================
 
         self.grad_cache["x"] = x
@@ -95,9 +95,9 @@ class LeakyReLU(Layer):
         """
         x = self.grad_cache["x"]
 
-        # TODO: Implement gradient w.r.t. the input x
+        # Implement gradient w.r.t. the input x
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        dx = torch.where(x > 0, dout, self.alpha * dout)
         # ========================
 
         return dx
@@ -116,7 +116,7 @@ class ReLU(LeakyReLU):
 
     def __init__(self):
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        super().__init__(alpha=0)
         # ========================
 
     def __repr__(self):
@@ -139,10 +139,11 @@ class Sigmoid(Layer):
         :return: Sigmoid of each sample in x.
         """
 
-        # TODO: Implement the Sigmoid function.
+        # Implement the Sigmoid function.
         #  Save whatever you need into grad_cache.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        self.grad_cache["x"] = x
+        out = 1 / (1 + torch.exp(-x))
         # ========================
 
         return out
@@ -153,9 +154,11 @@ class Sigmoid(Layer):
         :return: Gradient with respect to layer input, shape (N, *)
         """
 
-        # TODO: Implement gradient w.r.t. the input x
+        # Implement gradient w.r.t. the input x
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        x= self.grad_cache["x"]
+        sigmoid = 1 / (1 + torch.exp(-x))
+        dx = dout * (sigmoid**2) * torch.exp(-x)
         # ========================
 
         return dx
@@ -180,10 +183,11 @@ class TanH(Layer):
         :return: Sigmoid of each sample in x.
         """
 
-        # TODO: Implement the tanh function.
+        # Implement the tanh function.
         #  Save whatever you need into grad_cache.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        self.grad_cache["x"] = x
+        out = (torch.exp(x) - torch.exp(-x)) / (torch.exp(x) + torch.exp(-x))
         # ========================
 
         return out
@@ -194,9 +198,11 @@ class TanH(Layer):
         :return: Gradient with respect to layer input, shape (N, *)
         """
 
-        # TODO: Implement gradient w.r.t. the input x
+        # Implement gradient w.r.t. the input x
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        x = self.grad_cache["x"]
+        tanh = (torch.exp(x) - torch.exp(-x)) / (torch.exp(x) + torch.exp(-x))
+        dx = dout * (1 - tanh**2)
         # ========================
 
         return dx
@@ -220,11 +226,12 @@ class Linear(Layer):
         self.in_features = in_features
         self.out_features = out_features
 
-        # TODO: Create the weight matrix (self.w) and bias vector (self.b).
+        # Create the weight matrix (self.w) and bias vector (self.b).
         # Initialize the weights to zero-mean gaussian noise with a standard
         # deviation of `wstd`. Init bias to zero.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        self.w = torch.randn(out_features, in_features) * wstd
+        self.b = torch.zeros(out_features)
         # ========================
 
         # These will store the gradients
@@ -242,9 +249,9 @@ class Linear(Layer):
         :return: Affine transform of each sample in x.
         """
 
-        # TODO: Compute the affine transform
+        # Compute the affine transform
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        out = x @ self.w.T + self.b
         # ========================
 
         self.grad_cache["x"] = x
@@ -257,13 +264,15 @@ class Linear(Layer):
         """
         x = self.grad_cache["x"]
 
-        # TODO: Compute
+        # Compute
         #   - dx, the gradient of the loss with respect to x
         #   - dw, the gradient of the loss with respect to w
         #   - db, the gradient of the loss with respect to b
         #  Note: You should ACCUMULATE gradients in dw and db.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        dx = dout @ self.w
+        self.dw += dout.T @ x
+        self.db += dout.sum(dim=0)
         # ========================
 
         return dx
@@ -301,10 +310,12 @@ class CrossEntropyLoss(Layer):
         xmax, _ = torch.max(x, dim=1, keepdim=True)
         x = x - xmax
 
-        # TODO: Compute the cross entropy loss using the last formula from the
+        # Compute the cross entropy loss using the last formula from the
         #  notebook (i.e. directly using the class scores).
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        log_probs = -x + torch.log(torch.sum(torch.exp(x), dim=1, keepdim=True))
+        true_log_probs = log_probs[torch.arange(N), y]
+        loss = torch.sum(true_log_probs) / N
         # ========================
 
         self.grad_cache["x"] = x
@@ -321,9 +332,12 @@ class CrossEntropyLoss(Layer):
         y = self.grad_cache["y"]
         N = x.shape[0]
 
-        # TODO: Calculate the gradient w.r.t. the input x.
+        # Calculate the gradient w.r.t. the input x.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        softmax = torch.exp(x) / torch.sum(torch.exp(x), dim=1, keepdim=True)
+        true_labels = torch.zeros_like(x)
+        true_labels[torch.arange(N), y] = 1
+        dx = (softmax - true_labels) / N
         # ========================
 
         return dx
@@ -379,10 +393,12 @@ class Sequential(Layer):
     def forward(self, x, **kw):
         out = None
 
-        # TODO: Implement the forward pass by passing each layer's output
+        # Implement the forward pass by passing each layer's output
         #  as the input of the next.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        out = x
+        for layer in self.layers:
+            out = layer.forward(out, **kw)
         # ========================
 
         return out
@@ -390,11 +406,13 @@ class Sequential(Layer):
     def backward(self, dout):
         din = None
 
-        # TODO: Implement the backward pass.
+        # Implement the backward pass.
         #  Each layer's input gradient should be the previous layer's output
         #  gradient. Behold the backpropagation algorithm in action!
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        din = dout
+        for layer in reversed(self.layers):
+            din = layer.backward(din)
         # ========================
 
         return din
@@ -402,9 +420,10 @@ class Sequential(Layer):
     def params(self):
         params = []
 
-        # TODO: Return the parameter tuples from all layers.
+        # Return the parameter tuples from all layers.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        for layer in self.layers:
+            params.extend(layer.params())
         # ========================
 
         return params
@@ -460,9 +479,18 @@ class MLP(Layer):
         """
         layers = []
 
-        # TODO: Build the MLP architecture as described.
+        # Build the MLP architecture as described.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        activation_layer = ReLU if activation == "relu" else Sigmoid
+        prev_layer_features = in_features
+        for hidden_feature in hidden_features:
+            layers.append(Linear(prev_layer_features, hidden_feature))
+            layers.append(activation_layer())
+            # TODO: Implement dropout
+            #if dropout:
+                #layers.append(Dropout(dropout))
+            prev_layer_features = hidden_feature
+        layers.append(Linear(prev_layer_features, num_classes))
         # ========================
 
         self.sequence = Sequential(*layers)
