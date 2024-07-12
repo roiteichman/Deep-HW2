@@ -10,27 +10,56 @@ math (delimited with $$).
 
 part1_q1 = r"""
 **Your answer:**
+1.
+A. The Jacobian tensor represents how each element in $Y$ changes with respect to each element in $X$.
+$Y$ has a shape of $(N, out Features)$ and $X$ has a shape of $(N, in Features)$.
+$W$ has a shape of $(out Features, in Features)$, the layer calculates $Y = XW^T$.
+Therefore, based on the definition of the Jacobian tensor,
+the shape of $\pderiv{\mat{Y}}{\mat{X}}$ is $(N, out Features, N, in Features) = (64, 512, 64, 1024)$.
+
+B. Each element in the output vector $𝑌$ is formed by a linear combination of a single row
+in the input matrix $𝑋$, which has $𝑁$ rows.
+When differentiating the output element with respect to different input samples, only 
+$1/𝑁$ of the elements in $\pderiv{\mat{Y}}{\mat{X}}$ are non-zero. Consequently, the Jacobian tensor is sparse.
+
+C. Instead of materializing the Jacobian tensor, it will be much more efficient to use the chain rule, as we learned in class,
+to compute: $∂x = \pderiv{\mat{L}}{\mat{X}} = \pderiv{\mat{L}}{\mat{Y}} \pderiv{\mat{Y}}{\mat{X}}$
+
+2. 
+A. The Jacobian tensor represents how each element in $Y$ changes with respect to each element in $W$.
+$Y$ has a shape of $(N, out Features)$ and $X$ has a shape of $(N, in Features)$.
+$W$ has a shape of $(out Features, in Features)$, the layer calculates $Y = XW^T$.
+Therefore, based on the definition of the Jacobian tensor,
+the shape of $\pderiv{\mat{Y}}{\mat{X}}$ is $(N, out Features, out Features, in Features) = (64, 512, 512, 1024)$.
+
+B. TODO - compare to friends: 
+based on ChatGPT answer:
+The Jacobian tensor $\frac{\partial \mathbf{Y}}{\partial \mathbf{W}}$ is not sparse by definition.
+Each element $y_{ij}$ in $\mathbf{Y}$ depends linearly on the row $i$ of the input $\mathbf{X}$
+and the entire weight matrix $\mathbf{W}$. Specifically, each element $y_{ij}$ can be expressed as:
+$y_{ij} = \sum_{k=1}^{1024} x_{ik} w_{jk}$ .
+The partial derivative of $y_{ij}$ with respect to $w_{jk}$ is $x_{ik}$,
+and hence the Jacobian is filled with these values. There are no zero elements by definition.
 
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+our answer:
+Each element in the output vector $𝑌$ is formed by a linear combination of a single column
+in the weight matrix $W$, which has $in Features$ columns.
+When differentiating the output element with respect to different weights, only 
+$1/in Features$ of the elements in $\pderiv{\mat{Y}}{\mat{W}}$ are non-zero. Consequently, the Jacobian tensor is sparse.
 
+C. We don't need to materialize the Jacobian tensor, it will be much more efficient to use the chain rule:
+$∂W = \pderiv{\mat{L}}{\mat{W}} = \pderiv{\mat{L}}{\mat{Y}} \pderiv{\mat{Y}}{\mat{W}}$
 """
 
 part1_q2 = r"""
 **Your answer:**
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+Theoretically, it's possible to compute gradients of the loss with respect to weights in neural networks
+without relying on back-propagation and the chain rule.
+This would involve manually calculating gradients for each parameter,
+disregarding the efficient layer-by-layer propagation used in back-propagation.
+However, this approach would be impractical for deep networks with many layers and parameters.
 
 """
 
