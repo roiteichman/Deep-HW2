@@ -156,9 +156,9 @@ class Sigmoid(Layer):
 
         # Implement gradient w.r.t. the input x
         # ====== YOUR CODE: ======
-        x= self.grad_cache["x"]
+        x = self.grad_cache["x"]
         sigmoid = 1 / (1 + torch.exp(-x))
-        dx = dout * (sigmoid**2) * torch.exp(-x)
+        dx = dout * (sigmoid ** 2) * torch.exp(-x)
         # ========================
 
         return dx
@@ -202,7 +202,7 @@ class TanH(Layer):
         # ====== YOUR CODE: ======
         x = self.grad_cache["x"]
         tanh = (torch.exp(x) - torch.exp(-x)) / (torch.exp(x) + torch.exp(-x))
-        dx = dout * (1 - tanh**2)
+        dx = dout * (1 - tanh ** 2)
         # ========================
 
         return dx
@@ -251,7 +251,7 @@ class Linear(Layer):
 
         # Compute the affine transform
         # ====== YOUR CODE: ======
-        out = x @ self.w.T + self.b
+        out = torch.matmul(x, self.w.t()) + self.b
         # ========================
 
         self.grad_cache["x"] = x
@@ -270,9 +270,9 @@ class Linear(Layer):
         #   - db, the gradient of the loss with respect to b
         #  Note: You should ACCUMULATE gradients in dw and db.
         # ====== YOUR CODE: ======
-        dx = dout @ self.w
-        self.dw += dout.T @ x
-        self.db += dout.sum(dim=0)
+        dx = torch.matmul(dout, self.w)
+        self.dw += torch.matmul(dout.t(), x)
+        self.db += torch.sum(dout, dim=0)
         # ========================
 
         return dx
@@ -357,19 +357,28 @@ class Dropout(Layer):
         self.p = p
 
     def forward(self, x, **kw):
-        # TODO: Implement the dropout forward pass.
+        #  Implement the dropout forward pass.
         #  Notice that contrary to previous layers, this layer behaves
         #  differently a according to the current training_mode (train/test).
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        if self.training_mode:
+            mask = torch.rand_like(x) > self.p
+            out = x * mask
+            self.grad_cache["mask"] = mask
+        else:
+            out = x * (1 - self.p)
         # ========================
 
         return out
 
     def backward(self, dout):
-        # TODO: Implement the dropout backward pass.
+        # Implement the dropout backward pass.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        mask = self.grad_cache["mask"]
+        if self.training_mode:
+            dx = dout * mask
+        else:
+            dx = dout * (1 - self.p)
         # ========================
 
         return dx
@@ -459,13 +468,13 @@ class MLP(Layer):
     """
 
     def __init__(
-        self,
-        in_features,
-        num_classes,
-        hidden_features=(),
-        activation="relu",
-        dropout=0,
-        **kw,
+            self,
+            in_features,
+            num_classes,
+            hidden_features=(),
+            activation="relu",
+            dropout=0,
+            **kw,
     ):
         super().__init__()
         """
@@ -486,9 +495,8 @@ class MLP(Layer):
         for hidden_feature in hidden_features:
             layers.append(Linear(prev_layer_features, hidden_feature))
             layers.append(activation_layer())
-            # TODO: Implement dropout
-            #if dropout:
-                #layers.append(Dropout(dropout))
+            if dropout > 0:
+                layers.append(Dropout(dropout))
             prev_layer_features = hidden_feature
         layers.append(Linear(prev_layer_features, num_classes))
         # ========================

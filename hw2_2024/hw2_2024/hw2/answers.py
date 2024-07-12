@@ -70,9 +70,11 @@ However, this approach would be impractical for deep networks with many layers a
 
 def part2_overfit_hp():
     wstd, lr, reg = 0, 0, 0
-    # TODO: Tweak the hyperparameters until you overfit the small dataset.
+    # Tweak the hyperparameters until you overfit the small dataset.
     # ====== YOUR CODE: ======
-    raise NotImplementedError()
+    wstd = 0.1
+    lr = 0.01
+    reg = 0.0001
     # ========================
     return dict(wstd=wstd, lr=lr, reg=reg)
 
@@ -86,10 +88,15 @@ def part2_optim_hp():
         0,
     )
 
-    # TODO: Tweak the hyperparameters to get the best results you can.
+    # Tweak the hyperparameters to get the best results you can.
     # You may want to use different learning rates for each optimizer.
     # ====== YOUR CODE: ======
-    raise NotImplementedError()
+    # TODO - compare with friends
+    wstd = 0.1
+    lr_vanilla = 0.05
+    lr_momentum = 0.005
+    lr_rmsprop = 0.00016
+    reg = 0.004
     # ========================
     return dict(
         wstd=wstd,
@@ -108,7 +115,8 @@ def part2_dropout_hp():
     # TODO: Tweak the hyperparameters to get the model to overfit without
     # dropout.
     # ====== YOUR CODE: ======
-    raise NotImplementedError()
+    wstd = 0.1
+    lr = 0.001
     # ========================
     return dict(wstd=wstd, lr=lr)
 
@@ -116,26 +124,27 @@ def part2_dropout_hp():
 part2_q1 = r"""
 **Your answer:**
 
+1. According to the graphs we can see that the dropout improve the test accuracy and reduce the overfitting as we expected.
+we can see that the test loss of dropout=0 is increasing from Iteration=15 while the dropout=0.4 and dropout=0.8 are decreasing.
+moreover the test accuracy of the dropout=0.4 and dropout=0.8 are higher than the dropout=0. 
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
-
+2. We can see that the dropout=0.4 is better than the dropout=0.8 because the dropout=0.8 is too high and the model is
+not learning enough, because it is underfitting.
 """
 
 part2_q2 = r"""
 **Your answer:**
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+Yes it is possible.
+Cross-entropy loss measures not only whether the predictions are correct
+but also how confident the model is about its predictions, 
+While accuracy calculates the percentage of correct predictions.
+Even if the model correctly classifies more instances,
+if its confidence in these predictions is lower than before,
+the loss can increase.
+For example, if the model shifts from making very confident but incorrect
+predictions to making less confident but correct predictions,
+the loss might increase despite higher accuracy.
 
 """
 
