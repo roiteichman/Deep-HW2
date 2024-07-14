@@ -151,26 +151,71 @@ the loss might increase despite higher accuracy.
 part2_q3 = r"""
 **Your answer:**
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
-
+1. Gradient Descent is an optimization algorithm used to minimize the loss function by iteratively moving
+ in the direction defined by the negative of the gradient, which is the steepest descent.
+ Back-propagation is a specific algorithm used to calculate the gradients of the loss function with respect
+  to the parameters of a neural network. It uses the chain rule to compute these gradients efficiently,
+  layer by layer, from the output layer back to the input layer.
+ 
+ 2. We will focus in some differences:
+ - Batch Size: in Gradient Descent, the batch size is the number of samples used to compute the gradient,
+ in contrast to in Stoachastic Gradient Descent, the batch size is 1, which means that the gradient is
+ computed for each sample, or subset of samples, in size of a number between 1 and the number of samples.
+ - Computational Complexity, Speed And Accuracy Convergence: Gradient Descent is more computationally expensive
+ than SGD, because it computes the gradient for the entire dataset, therefore is slower to converge than SGD but also
+ more accurate. On the other hand SGD is faster to converge because it computes the gradient for a subset of samples,
+ but it is less accurate.
+ 
+  3. SGD used more often than Gradient Descent because it is faster to converge and it is more efficient, making it more
+  scalable with large datasets. In addition, the noisy behavior of SGD can help it escape local minima and saddle points, 
+  making it is more robust, improve generalization and preventing it from overfitting.
+  
+  4. 
+  - A. The loss of each batch from the forward pass can be written as: $L_i = L(X_i, y_i)$
+  Therefore, the total loss over all batches can be written as:
+  $L_{\text{total}} = \sum_{i=1}^{B} L_i$ .
+  From calculus, we know that the gradient of a sum is the sum of the gradients, thus:
+  $\nabla_\theta L_{\text{total}} = \nabla_\theta \sum_{i=1}^{B} L(X_i, y_i) = \sum_{i=1}^{B} \nabla_\theta L(X_i, y_i)$ .
+  It means that splitting the data into disjoint batches, do multiple forward passes until all data is exhausted,
+  and then do one backward pass on the sum of the losses is equivalent to computing the gradient of the
+  loss over the entire dataset as in traditional GD.
+  
+  - B. We using the memory not only for training the model, but also for storing the data, the model, the gradients,
+  the activations and intermediate calculations. The memory error can occur for example when we didn't clearing
+  intermediate computational graphs that not needed anymore, or when the intermediate tensors that requiered
+  to back propagation are too large to fit in memory.
+ 
+  
 """
 
 part2_q4 = r"""
 **Your answer:**
 
+1.
+- A. In forward mode AD, we propagate both the value and its derivative through the computational graph.
+Typically, forward mode maintains $𝑂(𝑛)$ computation cost but can have high memory complexity if intermediate
+derivatives are stored.
+    - To reduce memory complexity:
+        - initialize $v=x_0$ and the derivative at $v=x_0$ to 1 because $\pderiv{\mat{}}{\mat{X}}X=1$
+        - for each operation in the computational graph (for i=1 to n):
+            - compute the value of $f$ at $v$ by evaluating the chain of functions: $v = f_i(v)$ .
+            - compute the derivative by propagating the derivative forward: $v' = f'_i(v) \cdot v'$ .
+    - The memory complexity now is $O(1)$ because in this way we can store only the value and the derivative at each step,
+    and not the intermediate derivatives.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+- B. In reverse mode AD, we propagate the derivative backward through the computational graph.
+Typically, reverse mode maintains $𝑂(𝑛)$ computation cost but can have high memory complexity if intermediate
+derivatives are stored.
+    - To reduce memory complexity:
+        - preform a forward pass and store the intermidiate values $v_i=f_i(v_{i-1})$ for each operation in the computational graph.
+        - during the backward pass:
+            - initialize the derivative at the output node to $delta=1$
+            - for each operation in the computational graph:
+                - compute the derivative by propagating the derivative backward: v_i = f_i(v_{i-1})
+                - compute $delta = delta \cdot f'_i(v_i)$
+    - In this approach recomputes v_i during the backward pass to save memory, and not store the intermediate derivatives,
+    therefore the memory complexity now is $O(1)$
+
 
 """
 
