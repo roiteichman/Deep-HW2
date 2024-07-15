@@ -209,12 +209,29 @@ derivatives are stored.
     - To reduce memory complexity:
         - preform a forward pass and store the intermidiate values $v_i=f_i(v_{i-1})$ for each operation in the computational graph.
         - during the backward pass:
-            - initialize the derivative at the output node to $delta=1$
+            - initialize the derivative at the output node to $δ=1$
             - for each operation in the computational graph:
-                - compute the derivative by propagating the derivative backward: v_i = f_i(v_{i-1})
-                - compute $delta = delta \cdot f'_i(v_i)$
+                - compute the derivative by propagating the derivative backward: $v_i = f_i(v_{i-1})$
+                - compute $δ = δ \cdot f'_i(v_i)$
     - In this approach recomputes v_i during the backward pass to save memory, and not store the intermediate derivatives,
-    therefore the memory complexity now is $O(1)$
+    therefore the memory complexity now is $O(1)$.
+
+2. These techniques can be generalized for arbitrary computational graphs by applying similar principles of storing
+minimal intermediate values and recomputing them as necessary. For example, by using a checkpointing strategy to store
+only the critical nodes in the computational graph and recomputing intermediate values on demand, we can reduce memory
+complexity in both forward and reverse mode AD. Specifically, in forward mode AD, store only the current value and derivative
+and in backward mode AD, store critical nodes and recompute intermediate values on demand.
+
+3. When trying to applied these techniques to deep architectures like ResNets or VGGs that have many layers and parameters,
+the memory complexity can be very high and the memory error can occur. By applying these techniques, that helps to balance
+the trade-off between memory and computation, we can reduce the memory complexity and prevent memory errors, making it
+possible to train very deep networks more efficiently, without exceeding memory limits.
+
+
+
+
+
+
 
 
 """
