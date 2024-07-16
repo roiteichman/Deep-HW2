@@ -227,13 +227,6 @@ the memory complexity can be very high and the memory error can occur. By applyi
 the trade-off between memory and computation, we can reduce the memory complexity and prevent memory errors, making it
 possible to train very deep networks more efficiently, without exceeding memory limits.
 
-
-
-
-
-
-
-
 """
 
 # ==============
@@ -280,39 +273,69 @@ def part3_optim_hp():
 part3_q1 = r"""
 **Your answer:**
 
+1. High Optimization Error: to reduce it we can use GD variants like SGD, Adam, RMSprop, etc,
+because they can help to reduce the variance of the gradient estimation, and therefore reduce the optimization error.
+Another option is to use a learning rate scheduler, that can help to reduce the learning rate during training,
+and therefore reduce the optimization error.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+2. High Generalization Error: to reduce it we can use regularization techniques like L1, L2, dropout, etc,
+that can help to reduce the model complexity and prevent overfitting.
+Another option is to use early stopping, that can help to stop the training when the validation error is not improving,
+and therefore prevent overfitting.
+Moreover we can use data augmentation techniques, that increasing the size of the training set,
+or batch normalization, that can help to stabilize the training process.
+We have learned them both in lectures 4-5, and they both can improve the generalization.  
+In CNNs we can increase the receptive field, that allows the model to capture more context 
+and improve its ability to generalize. Another option is to use techniques like max pooling, or mean pooling, 
+that can help to reduce the spatial dimension of the input, and therefore reduce the model complexity and prevent overfitting.
+ 
+3. High Approximation Error: to reduce it we can use a more complex model, like a deeper model,
+or different architecture, like CNN, RNN, etc, that can help to learn more complex patterns.
+Moreover, we can use a different activation function, like ReLU, LeakyReLU, etc, that can help to learn more complex patterns.
+In addition, we can use a different optimizer, like Adam, RMSprop, etc, that can help to learn more complex patterns.
+Other option is to use boosting techniques, like AdaBoost, Gradient Boosting, etc, that can help to learn more complex patterns. 
+In CNNs we can increase the receptive field, that allows the model to capture more context
+and improve its ability to generalize.
 
 """
 
 part3_q2 = r"""
 **Your answer:**
 
+Scenario: COVID-19 Screening Test
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+High False Positive Rate:
+- In an area where COVID-19 prevalence is low, a high FPR means that many people who do not have COVID-19 are being
+incorrectly classified as positive by the screening test.
+- Reasons for a high FPR could include:
+    - Inaccurate test results due to very sensitivity test that trying to ensure no cases are missed.
+    - Precautionary principle, where the test is designed to be overly cautious to avoid missing any cases.
+    - Incorrect interpretation of test results due to human error.
+
+High False Negative Rate:
+- In an area where COVID-19 prevalence is high, a high FNR means that many people who have COVID-19 are being
+incorrectly classified as negative by the screening test.
+- Reasons for a high FNR could include:
+    - Speed over accuracy, where the test is designed to be fast and easy to administer, but may miss some cases.
+    - Inaccurate test results due to low sensitivity test.
+    - Inadequate sample collection or handling leading to false negatives.
+    - Limited resources or testing capacity leading to false negatives.
 
 """
 
 part3_q3 = r"""
 **Your answer:**
 
+1. Since the disease will eventually show non-lethal symptoms leading to diagnosis and treatment,
+the goal is to avoid unnecessary expensive and risky tests for healthy patients.
+This means accepting a higher rate of false negatives because these cases will be caught later when symptoms develop.
+Therefore, we need a high threshold where the true positive rate (TPR) is reasonable and the false positive rate (FPR) is low.
+This will ensure that the test is not overly sensitive and does not produce too many false positives.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+2. Missing a diagnosis can be fatal, so the model must be highly sensitive to ensure early detection.
+False positives, while costly and risky, are preferable to missing cases that could result in death.
+Therefore, we need a low threshold where the TPR is high even if the FPR is high.
+This will ensure that the test is highly sensitive and does not miss any cases, even if it produces many false positives.
 
 """
 
@@ -320,13 +343,17 @@ An equation: $e^{i\pi} -1 = 0$
 part3_q4 = r"""
 **Your answer:**
 
+MLP might not be the best choice for train on sequential data because:
+- MLPs treat each input independently and do not inherently capture the sequential nature of the data.
+In the case of text, where the order of words is crucial for understanding the meaning and context,
+an MLP does not account for the relationships between words across different positions in the sequence.
+- MLPs have a fixed input size, which can be problematic for sequences of varying lengths.
+For example, in the case of text, sentences can have different lengths, and an MLP would require padding or truncating
+to fit all inputs to a fixed size.
+- MLPs do not have memory, so they cannot remember past inputs or context from previous time steps. This is crucial for
+sequential data where the current output depends on previous inputs. For example, in language modeling, the prediction
+of the next word depends on the words that came before it.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
 
 """
 # ==============
@@ -352,7 +379,7 @@ def part4_optim_hp():
 
 part4_q1 = r"""
 **Your answer:**
-
+4.1
 
 Write your answer using **markdown** and $\LaTeX$:
 ```python
@@ -371,7 +398,7 @@ An equation: $e^{i\pi} -1 = 0$
 
 part5_q1 = r"""
 **Your answer:**
-
+5.1
 
 Write your answer using **markdown** and $\LaTeX$:
 ```python
