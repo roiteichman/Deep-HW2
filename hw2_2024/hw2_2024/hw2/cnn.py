@@ -71,7 +71,7 @@ class CNN(nn.Module):
         in_channels, in_h, in_w, = tuple(self.in_size)
 
         layers = []
-        # TODO: Create the feature extractor part of the model:
+        #  Create the feature extractor part of the model:
         #  [(CONV -> ACT)*P -> POOL]*(N/P)
         #  Apply activation function after each conv, using the activation type and
         #  parameters.
@@ -80,8 +80,12 @@ class CNN(nn.Module):
         #  Note: If N is not divisible by P, then N mod P additional
         #  CONV->ACTs should exist at the end, without a POOL after them.
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
-
+        for i in range(len(self.channels)):
+            layers.append(nn.Conv2d(in_channels, self.channels[i], **self.conv_params))
+            layers.append(ACTIVATIONS[self.activation_type](**self.activation_params))
+            in_channels = self.channels[i]
+            if (i + 1) % self.pool_every == 0:
+                layers.append(POOLINGS[self.pooling_type](**self.pooling_params))
         # ========================
         seq = nn.Sequential(*layers)
         return seq
@@ -95,13 +99,14 @@ class CNN(nn.Module):
         rng_state = torch.get_rng_state()
         try:
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            _, c, w, h = self.feature_extractor(torch.rand(1, *self.in_size)).shape
             # ========================
         finally:
             torch.set_rng_state(rng_state)
 
+        return c * w * h
+
     def _make_mlp(self):
-        # TODO:
         #  - Create the MLP part of the model: (FC -> ACT)*M -> Linear
         #  - Use the the MLP implementation from Part 1.
         #  - The first Linear layer should have an input dim of equal to the number of
@@ -109,17 +114,26 @@ class CNN(nn.Module):
         #  - The last Linear layer should have an output dim of out_classes.
         mlp: MLP = None
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        nonlins = [
+            ACTIVATIONS[self.activation_type](**self.activation_params)
+            for _ in self.hidden_dims
+        ]
+        nonlins.append(None)
+
+        mlp = MLP(self._n_features(), dims=[*self.hidden_dims, self.out_classes],
+                  nonlins=nonlins)
         # ========================
         return mlp
 
     def forward(self, x: Tensor):
-        # TODO: Implement the forward pass.
+        #  Implement the forward pass.
         #  Extract features from the input, run the classifier on them and
         #  return class scores.
         out: Tensor = None
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        out = self.feature_extractor(x)
+        out = out.view(out.size(0), -1)
+        out = self.mlp(out)
         # ========================
         return out
 

@@ -79,7 +79,7 @@ class Trainer(abc.ABC):
                 verbose = True
             self._print(f"--- EPOCH {epoch+1}/{num_epochs} ---", verbose)
 
-            # TODO: Train & evaluate for one epoch
+            # Train & evaluate for one epoch
             #  - Use the train/test_epoch methods.
             #  - Save losses and accuracies in the lists above.
             # ====== YOUR CODE: ======
@@ -94,7 +94,6 @@ class Trainer(abc.ABC):
                     test_acc.append(test_result.accuracy)
             # ========================
 
-            # TODO:
             #  - Optional: Implement early stopping. This is a very useful and
             #    simple regularization technique that is highly recommended.
             #  - Optional: Implement checkpoints. You can use the save_checkpoint
@@ -264,13 +263,18 @@ class ClassifierTrainer(Trainer):
         batch_loss: float
         num_correct: int
 
-        # TODO: Train the model on one batch of data.
+        # Train the model on one batch of data.
         #  - Forward pass
         #  - Backward pass
         #  - Update parameters
         #  - Classify and calculate number of correct predictions
         # ====== YOUR CODE: ======
-        raise NotImplementedError()
+        pred = self.model(X)
+        batch_loss = self.loss_fn(pred, y)
+        self.optimizer.zero_grad()
+        batch_loss.backward()
+        self.optimizer.step()
+        num_correct = torch.sum(torch.argmax(pred, dim=1) == y).item()
         # ========================
 
         return BatchResult(batch_loss, num_correct)
@@ -290,7 +294,9 @@ class ClassifierTrainer(Trainer):
             #  - Forward pass
             #  - Calculate number of correct predictions
             # ====== YOUR CODE: ======
-            raise NotImplementedError()
+            pred = self.model(X)
+            batch_loss = self.loss_fn(pred, y)
+            num_correct = torch.sum(torch.argmax(pred, dim=1) == y).item()
             # ========================
 
         return BatchResult(batch_loss, num_correct)
