@@ -273,12 +273,14 @@ def part3_optim_hp():
 part3_q1 = r"""
 **Your answer:**
 
-1. High Optimization Error: to reduce it we can use GD variants like SGD, Adam, RMSprop, etc,
+1. High Optimization Error: Optimization error occurs when the model fails to find the best parameters that minimize the training loss.
+To reduce it we can use GD variants like SGD, Adam, RMSprop, etc,
 because they can help to reduce the variance of the gradient estimation, and therefore reduce the optimization error.
 Another option is to use a learning rate scheduler, that can help to reduce the learning rate during training,
 and therefore reduce the optimization error.
 
-2. High Generalization Error: to reduce it we can use regularization techniques like L1, L2, dropout, etc,
+2. High Generalization Error: Generalization error refers to the difference between the training error and the test error. A high generalization error indicates that while the model performs well on the training data, it performs poorly on unseen test data, suggesting overfitting.
+To reduce it we can use regularization techniques like L1, L2, dropout, etc,
 that can help to reduce the model complexity and prevent overfitting.
 Another option is to use early stopping, that can help to stop the training when the validation error is not improving,
 and therefore prevent overfitting.
@@ -289,7 +291,8 @@ In CNNs we can increase the receptive field, that allows the model to capture mo
 and improve its ability to generalize. Another option is to use techniques like max pooling, or mean pooling, 
 that can help to reduce the spatial dimension of the input, and therefore reduce the model complexity and prevent overfitting.
  
-3. High Approximation Error: to reduce it we can use a more complex model, like a deeper model,
+3. High Approximation Error: Approximation error occurs when the chosen model or hypothesis class is too simple to capture the relationships in the data. This suggets underfitting.
+To reduce it we can use a more complex model, like a deeper model,
 or different architecture, like CNN, RNN, etc, that can help to learn more complex patterns.
 Moreover, we can use a different activation function, like ReLU, LeakyReLU, etc, that can help to learn more complex patterns.
 In addition, we can use a different optimizer, like Adam, RMSprop, etc, that can help to learn more complex patterns.
