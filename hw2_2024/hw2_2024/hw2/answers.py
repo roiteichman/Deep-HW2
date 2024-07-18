@@ -385,14 +385,38 @@ def part4_optim_hp():
 
 part4_q1 = r"""
 **Your answer:**
-4.1
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+1. As we learned in the lecture, the number of parameter is determine by the following formula:
+$N_{\text{parameters}} = (F \cdot F \cdot K + 1)\cdot L)$
+where:
+- $F$ is the size of the filter.
+- $K$ is the number of input channels.
+- $L$ is the number of output channels.
++1 because the bias is counted as a parameter.
+Therefore, the number of parameters in the first layer is:
+    - So if we have two convolutional layers with 3x3 kernel, 256 input channel and 256 output channel, the number of parameters is: 
+    $N_{\text{parameters}} = (3 \cdot 3 \cdot 256 + 1) \cdot 256) + (3 \cdot 3 \cdot 256 + 1) \cdot 256) = 1,180,160$
+    - on the other hand, if we 256 input channel and 256 output channel, and we use in bottleneck layer 1x1 kernel,
+    to reduce to a layer of 64 output channel, then making 3x3 kernel to 64 output channel, and then 1x1 kernel to 256 output channel,
+    the number of parameters is:
+    $N_{\text{parameters}} = (1 \cdot 1 \cdot 256 + 1) \cdot 64) + (3 \cdot 3 \cdot 64 + 1) \cdot 64) + (1 \cdot 1 \cdot 64 + 1) \cdot 256) = 70,400$
+
+2. The Number of floating point operations required to compute an output of a convolutional layer is determined by the following formula:
+$FLOPs = (F \cdot F \cdot K \cdot L \cdot H \cdot W)$
+where:
+- $F$ is the size of the filter.
+- $K$ is the number of input channels.
+- $L$ is the number of output channels.
+- $H$ is the height of the input.
+- $W$ is the width of the input.
+Therefore, the number of FLOPs in the first layer is:
+    - So if we have two convolutional layers with 3x3 kernel, 256 input channel and 256 output channel, and the input image is HxW,
+    the number of FLOPs is: $FLOPs = (3 \cdot 3 \cdot 256 \cdot 256 \cdot H \cdot W) + (3 \cdot 3 \cdot 256 \cdot 256 \cdot H \cdot W) = 1,572,864 \cdot H \cdot W$
+    - on the other hand, if we 256 input channel and 256 output channel, and we use in bottleneck layer 1x1 kernel,
+    to reduce to a layer of 64 output channel, then making 3x3 kernel to 64 output channel, and then 1x1 kernel to 256 output channel,
+    the number of FLOPs is: $FLOPs = (1 \cdot 1 \cdot 256 \cdot 64 \cdot H \cdot W) + (3 \cdot 3 \cdot 64 \cdot 64 \cdot H \cdot W) + (1 \cdot 1 \cdot 64 \cdot 256 \cdot H \cdot W) = 1,179,648 \cdot H \cdot W$
+
+3. 
 
 """
 
