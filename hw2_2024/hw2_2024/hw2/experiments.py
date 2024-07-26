@@ -10,11 +10,11 @@ from torch.utils.data import DataLoader
 from torchvision.datasets import CIFAR10
 
 from cs236781.train_results import FitResult
-
-from .cnn import CNN, ResNet
-from .mlp import MLP
-from .training import ClassifierTrainer
-from .classifier import ArgMaxClassifier, BinaryClassifier, select_roc_thresh
+# TODO - remove hw2 after experiments
+from hw2.cnn import CNN, ResNet
+from hw2.mlp import MLP
+from hw2.training import ClassifierTrainer
+from hw2.classifier import ArgMaxClassifier, BinaryClassifier, select_roc_thresh
 
 DATA_DIR = os.path.expanduser("~/.pytorch-datasets")
 
@@ -149,7 +149,6 @@ def cnn_experiment(
 
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=reg)
-    model = ArgMaxClassifier(model)
 
     trainer = ClassifierTrainer(model, criterion, optimizer, device)
 
