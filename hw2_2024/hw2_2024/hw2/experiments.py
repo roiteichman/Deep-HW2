@@ -71,7 +71,16 @@ def cnn_experiment(
     hidden_dims=[1024],
     model_type="cnn",
     # You can add extra configuration for your experiments here
-    **kw,
+    activation_type="relu",
+    activation_params={},
+    pooling_type="max",
+    pooling_kernel_size=3,
+    batchnorm=True,
+    dropout=0.0,
+    bottleneck=False,
+    kernel_size=3,
+    padding=1,
+    ** kw,
 ):
     """
     Executes a single run of a Part3 experiment with a single configuration.
@@ -107,7 +116,43 @@ def cnn_experiment(
     #   for you automatically.
     fit_res = None
     # ====== YOUR CODE: ======
-    raise NotImplementedError()
+
+    dl_train = torch.utils.data.DataLoader(ds_train, bs_train, shuffle=False)
+    dl_test = torch.utils.data.DataLoader(ds_test, bs_test, shuffle=False)
+
+    lists_of_channels = []
+    for k in filters_per_layer:
+        lists_of_channels.append([k] * layers_per_block)
+    flattened_channels = []
+    for sublist in lists_of_channels:
+        for item in sublist:
+            flattened_channels.append(item)
+    channels = flattened_channels
+
+    # if model_type == 'resnet':
+    #     kw['batchnorm'] = batchnorm
+    #     kw['dropout'] = dropout
+    #     kw['bottleneck'] = bottleneck
+
+    model = model_cls(
+        in_size=(3, 32, 32),
+        out_classes=10,
+        channels=channels,
+        pool_every=pool_every,
+        hidden_dims=hidden_dims,
+        activation_type=activation_type,
+        activation_params=activation_params,
+        pooling_type=pooling_type,
+        conv_params={'kernel_size': kernel_size, 'padding': padding},
+        pooling_params={'kernel_size': pooling_kernel_size},
+        **kw
+    ).to(device)
+
+    loss = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=reg)
+    trainer = ClassifierTrainer(model, loss, optimizer, device=device)
+    fit_res = trainer.fit(dl_train, dl_test, num_epochs=epochs, checkpoints=checkpoints,
+                          early_stopping=early_stopping, max_batches=batches, print_every=3)
     # ========================
 
     save_experiment(run_name, out_dir, cfg, fit_res)

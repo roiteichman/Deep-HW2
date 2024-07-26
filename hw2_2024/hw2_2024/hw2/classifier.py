@@ -22,7 +22,7 @@ class Classifier(nn.Module, ABC):
 
         # Add any additional initializations here, if you need them.
         # ====== YOUR CODE: ======
-        self.softmax = nn.Softmax(dim=1)
+        self.softmax = torch.softmax(dim=1)
         # ========================
 
     def forward(self, x: Tensor) -> Tensor:
@@ -34,7 +34,7 @@ class Classifier(nn.Module, ABC):
 
         # Implement the forward pass, returning raw scores from the wrapped model.
         # ====== YOUR CODE: ======
-        z = self.model(x)
+        z = self.model.forward(x)
         # ========================
         assert z.shape[0] == x.shape[0] and z.ndim == 2, "raw scores should be (N, C)"
         return z

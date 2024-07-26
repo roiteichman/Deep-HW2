@@ -80,8 +80,10 @@ class CNN(nn.Module):
         #  Note: If N is not divisible by P, then N mod P additional
         #  CONV->ACTs should exist at the end, without a POOL after them.
         # ====== YOUR CODE: ======
+        conv_params = self.conv_params.copy()
+
         for i in range(len(self.channels)):
-            layers.append(nn.Conv2d(in_channels, self.channels[i], **self.conv_params))
+            layers.append(nn.Conv2d(in_channels, self.channels[i], **conv_params))
             layers.append(ACTIVATIONS[self.activation_type](**self.activation_params))
             in_channels = self.channels[i]
             if (i + 1) % self.pool_every == 0:
@@ -100,6 +102,7 @@ class CNN(nn.Module):
         try:
             # ====== YOUR CODE: ======
             _, c, w, h = self.feature_extractor(torch.rand(1, *self.in_size)).shape
+            # TODO: idan&jona put the return here
             # ========================
         finally:
             torch.set_rng_state(rng_state)
@@ -114,10 +117,7 @@ class CNN(nn.Module):
         #  - The last Linear layer should have an output dim of out_classes.
         mlp: MLP = None
         # ====== YOUR CODE: ======
-        nonlins = [
-            ACTIVATIONS[self.activation_type](**self.activation_params)
-            for _ in self.hidden_dims
-        ]
+        nonlins = [ACTIVATIONS[self.activation_type](**self.activation_params) for _ in self.hidden_dims]
         nonlins.append(None)
 
         mlp = MLP(self._n_features(), dims=[*self.hidden_dims, self.out_classes],
@@ -196,15 +196,17 @@ class ResidualBlock(nn.Module):
         self.main_path = nn.Sequential()
         self.shortcut_path = nn.Sequential()
 
-        self.main_path.add_module('conv1', nn.Conv2d(in_channels, channels[0], kernel_sizes[0], padding=kernel_sizes[0] // 2, bias=True))
-        self.main_path.add_module('dropout1', nn.Dropout2d(p=dropout))
+        self.main_path.add_module('conv1', nn.Conv2d(in_channels, channels[0], kernel_sizes[0], padding='same', bias=True))
+        if dropout > 0:
+            self.main_path.add_module('dropout1', nn.Dropout2d(p=dropout))
         if batchnorm:
             self.main_path.add_module('batchnorm1', nn.BatchNorm2d(channels[0]))
         self.main_path.add_module('relu1', ACTIVATIONS[activation_type](**activation_params))
         for i in range(1, len(channels)):
-            self.main_path.add_module(f'conv{i + 1}', nn.Conv2d(channels[i - 1], channels[i], kernel_sizes[i], padding=kernel_sizes[i] // 2, bias=True))
+            self.main_path.add_module(f'conv{i + 1}', nn.Conv2d(channels[i - 1], channels[i], kernel_sizes[i], padding='same', bias=True))
             if i < len(channels) - 1:
-                self.main_path.add_module(f'dropout{i + 1}', nn.Dropout2d(p=dropout))
+                if dropout > 0:
+                    self.main_path.add_module(f'dropout{i + 1}', nn.Dropout2d(p=dropout))
                 if batchnorm:
                     self.main_path.add_module(f'batchnorm{i + 1}', nn.BatchNorm2d(channels[i]))
                 self.main_path.add_module(f'relu{i + 1}', ACTIVATIONS[activation_type](**activation_params))
