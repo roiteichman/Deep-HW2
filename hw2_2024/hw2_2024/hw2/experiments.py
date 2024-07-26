@@ -116,43 +116,49 @@ def cnn_experiment(
     #   for you automatically.
     fit_res = None
     # ====== YOUR CODE: ======
-
-    dl_train = torch.utils.data.DataLoader(ds_train, bs_train, shuffle=False)
-    dl_test = torch.utils.data.DataLoader(ds_test, bs_test, shuffle=False)
+    conv_params = {'kernel_size': kernel_size, 'padding': padding}
+    pooling_params = {'kernel_size': pooling_kernel_size}
+    kwargs = {}
+    # channels =[channel for channel in filters_per_layer for _ in range(layers_per_block)],
+    # if model_cls == ResNet:
+    #     kwargs = {'batchnorm': batchnorm,
+    #                          'dropout': dropout,
+    #                          'bottleneck': bottleneck}
+    x, _ = ds_train[0]
+    in_size = x.shape
 
     lists_of_channels = []
-    for k in filters_per_layer:
-        lists_of_channels.append([k] * layers_per_block)
+    for f in filters_per_layer:
+        lists_of_channels.append([f] * layers_per_block)
     flattened_channels = []
-    for sublist in lists_of_channels:
-        for item in sublist:
+    for channel_list in lists_of_channels:
+        for item in channel_list:
             flattened_channels.append(item)
-    channels = flattened_channels
 
-    # if model_type == 'resnet':
-    #     kw['batchnorm'] = batchnorm
-    #     kw['dropout'] = dropout
-    #     kw['bottleneck'] = bottleneck
+    model = model_cls(in_size=in_size,
+                      out_classes=10,
+                      channels=flattened_channels,
+                      pool_every=pool_every,
+                      hidden_dims=hidden_dims,
+                      conv_params=conv_params,
+                      activation_type=activation_type,
+                      activation_params=activation_params,
+                      pooling_type=pooling_type,
+                      pooling_params=pooling_params,
+                      **kwargs).to(device)
 
-    model = model_cls(
-        in_size=(3, 32, 32),
-        out_classes=10,
-        channels=channels,
-        pool_every=pool_every,
-        hidden_dims=hidden_dims,
-        activation_type=activation_type,
-        activation_params=activation_params,
-        pooling_type=pooling_type,
-        conv_params={'kernel_size': kernel_size, 'padding': padding},
-        pooling_params={'kernel_size': pooling_kernel_size},
-        **kw
-    ).to(device)
-
-    loss = torch.nn.CrossEntropyLoss()
+    criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=reg)
-    trainer = ClassifierTrainer(model, loss, optimizer, device=device)
-    fit_res = trainer.fit(dl_train, dl_test, num_epochs=epochs, checkpoints=checkpoints,
-                          early_stopping=early_stopping, max_batches=batches, print_every=3)
+    model = ArgMaxClassifier(model)
+
+    trainer = ClassifierTrainer(model, criterion, optimizer, device)
+
+    train_loader = DataLoader(ds_train, batch_size=bs_train, shuffle=False)
+    test_loader = DataLoader(ds_test, batch_size=bs_test, shuffle=False)
+
+    fit_res = trainer.fit(
+        train_loader, test_loader, num_epochs=epochs, early_stopping=early_stopping, checkpoints=checkpoints,
+        max_batches=batches, print_every=3)
     # ========================
 
     save_experiment(run_name, out_dir, cfg, fit_res)

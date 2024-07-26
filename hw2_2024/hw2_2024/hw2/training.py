@@ -85,7 +85,7 @@ class Trainer(abc.ABC):
             # ====== YOUR CODE: ======
             for dl in [dl_train, dl_test]:
                 if dl == dl_train:
-                    train_result = self.train_epoch(dl, verbose=verbose **kw)
+                    train_result = self.train_epoch(dl, verbose=verbose, **kw)
                     train_loss.append(sum(train_result.losses) / len(train_result.losses))
                     train_acc.append(train_result.accuracy)
                 else:
