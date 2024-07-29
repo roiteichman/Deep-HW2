@@ -142,8 +142,8 @@ class Sigmoid(Layer):
         # Implement the Sigmoid function.
         #  Save whatever you need into grad_cache.
         # ====== YOUR CODE: ======
-        self.grad_cache["x"] = x
         out = 1 / (1 + torch.exp(-x))
+        self.grad_cache["out"] = out
         # ========================
 
         return out
@@ -156,9 +156,8 @@ class Sigmoid(Layer):
 
         # Implement gradient w.r.t. the input x
         # ====== YOUR CODE: ======
-        x = self.grad_cache["x"]
-        sigmoid = 1 / (1 + torch.exp(-x))
-        dx = dout * (sigmoid ** 2) * torch.exp(-x)
+        out = self.grad_cache["out"]
+        dx = dout * out * (1 - out)
         # ========================
 
         return dx
@@ -186,8 +185,8 @@ class TanH(Layer):
         # Implement the tanh function.
         #  Save whatever you need into grad_cache.
         # ====== YOUR CODE: ======
-        self.grad_cache["x"] = x
         out = (torch.exp(x) - torch.exp(-x)) / (torch.exp(x) + torch.exp(-x))
+        self.grad_cache["out"] = out
         # ========================
 
         return out
@@ -200,9 +199,8 @@ class TanH(Layer):
 
         # Implement gradient w.r.t. the input x
         # ====== YOUR CODE: ======
-        x = self.grad_cache["x"]
-        tanh = (torch.exp(x) - torch.exp(-x)) / (torch.exp(x) + torch.exp(-x))
-        dx = dout * (1 - tanh ** 2)
+        out = self.grad_cache["out"]
+        dx = dout * (1 - out ** 2)
         # ========================
 
         return dx
@@ -366,7 +364,7 @@ class Dropout(Layer):
             out = x * mask
             self.grad_cache["mask"] = mask
         else:
-            out = x * (1 - self.p)
+            out = x * (1.0 - self.p)
         # ========================
 
         return out
@@ -378,7 +376,7 @@ class Dropout(Layer):
         if self.training_mode:
             dx = dout * mask
         else:
-            dx = dout * (1 - self.p)
+            dx = dout * (1.0 - self.p)
         # ========================
 
         return dx
