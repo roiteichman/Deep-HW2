@@ -384,7 +384,7 @@ def part4_optim_hp():
 
 
 part4_q1 = r"""
-*Your answer:*
+**Your answer:**
 
 1. As we learned in the lecture, the number of parameter is determine by the following formula:
 $N_{\text{parameters}} = (F \cdot F \cdot K + 1)\cdot L)$
