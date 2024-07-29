@@ -151,26 +151,81 @@ the loss might increase despite higher accuracy.
 part2_q3 = r"""
 **Your answer:**
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
-
+1. Gradient Descent is an optimization algorithm used to minimize the loss function by iteratively moving
+ in the direction defined by the negative of the gradient, which is the steepest descent.
+ Back-propagation is a specific algorithm used to calculate the gradients of the loss function with respect
+  to the parameters of a neural network. It uses the chain rule to compute these gradients efficiently,
+  layer by layer, from the output layer back to the input layer.
+ 
+ 2. We will focus in some differences:
+ - Batch Size: in Gradient Descent, the batch size is the number of samples used to compute the gradient,
+ in contrast to in Stoachastic Gradient Descent, the batch size is 1, which means that the gradient is
+ computed for each sample, or subset of samples, in size of a number between 1 and the number of samples.
+ - Computational Complexity, Speed And Accuracy Convergence: Gradient Descent is more computationally expensive
+ than SGD, because it computes the gradient for the entire dataset, therefore is slower to converge than SGD but also
+ more accurate. On the other hand SGD is faster to converge because it computes the gradient for a subset of samples,
+ but it is less accurate.
+ 
+  3. SGD used more often than Gradient Descent because it is faster to converge and it is more efficient, making it more
+  scalable with large datasets. In addition, the noisy behavior of SGD can help it escape local minima and saddle points, 
+  making it is more robust, improve generalization and preventing it from overfitting.
+  
+  4. 
+  - A. The loss of each batch from the forward pass can be written as: $L_i = L(X_i, y_i)$
+  Therefore, the total loss over all batches can be written as:
+  $L_{\text{total}} = \sum_{i=1}^{B} L_i$ .
+  From calculus, we know that the gradient of a sum is the sum of the gradients, thus:
+  $\nabla_\theta L_{\text{total}} = \nabla_\theta \sum_{i=1}^{B} L(X_i, y_i) = \sum_{i=1}^{B} \nabla_\theta L(X_i, y_i)$ .
+  It means that splitting the data into disjoint batches, do multiple forward passes until all data is exhausted,
+  and then do one backward pass on the sum of the losses is equivalent to computing the gradient of the
+  loss over the entire dataset as in traditional GD.
+  
+  - B. We using the memory not only for training the model, but also for storing the data, the model, the gradients,
+  the activations and intermediate calculations. The memory error can occur for example when we didn't clearing
+  intermediate computational graphs that not needed anymore, or when the intermediate tensors that requiered
+  to back propagation are too large to fit in memory.
+ 
+  
 """
 
 part2_q4 = r"""
 **Your answer:**
 
+1.
+- A. In forward mode AD, we propagate both the value and its derivative through the computational graph.
+Typically, forward mode maintains $𝑂(𝑛)$ computation cost but can have high memory complexity if intermediate
+derivatives are stored.
+    - To reduce memory complexity:
+        - initialize $v=x_0$ and the derivative at $v=x_0$ to 1 because $\pderiv{\mat{}}{\mat{X}}X=1$
+        - for each operation in the computational graph (for i=1 to n):
+            - compute the value of $f$ at $v$ by evaluating the chain of functions: $v = f_i(v)$ .
+            - compute the derivative by propagating the derivative forward: $v' = f'_i(v) \cdot v'$ .
+    - The memory complexity now is $O(1)$ because in this way we can store only the value and the derivative at each step,
+    and not the intermediate derivatives.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+- B. In reverse mode AD, we propagate the derivative backward through the computational graph.
+Typically, reverse mode maintains $𝑂(𝑛)$ computation cost but can have high memory complexity if intermediate
+derivatives are stored.
+    - To reduce memory complexity:
+        - preform a forward pass and store the intermidiate values $v_i=f_i(v_{i-1})$ for each operation in the computational graph.
+        - during the backward pass:
+            - initialize the derivative at the output node to $δ=1$
+            - for each operation in the computational graph:
+                - compute the derivative by propagating the derivative backward: $v_i = f_i(v_{i-1})$
+                - compute $δ = δ \cdot f'_i(v_i)$
+    - In this approach recomputes v_i during the backward pass to save memory, and not store the intermediate derivatives,
+    therefore the memory complexity now is $O(1)$.
+
+2. These techniques can be generalized for arbitrary computational graphs by applying similar principles of storing
+minimal intermediate values and recomputing them as necessary. For example, by using a checkpointing strategy to store
+only the critical nodes in the computational graph and recomputing intermediate values on demand, we can reduce memory
+complexity in both forward and reverse mode AD. Specifically, in forward mode AD, store only the current value and derivative
+and in backward mode AD, store critical nodes and recompute intermediate values on demand.
+
+3. When trying to applied these techniques to deep architectures like ResNets or VGGs that have many layers and parameters,
+the memory complexity can be very high and the memory error can occur. By applying these techniques, that helps to balance
+the trade-off between memory and computation, we can reduce the memory complexity and prevent memory errors, making it
+possible to train very deep networks more efficiently, without exceeding memory limits.
 
 """
 
@@ -218,39 +273,72 @@ def part3_optim_hp():
 part3_q1 = r"""
 **Your answer:**
 
+1. High Optimization Error: Optimization error occurs when the model fails to find the best parameters that minimize the training loss.
+To reduce it we can use GD variants like SGD, Adam, RMSprop, etc,
+because they can help to reduce the variance of the gradient estimation, and therefore reduce the optimization error.
+Another option is to use a learning rate scheduler, that can help to reduce the learning rate during training,
+and therefore reduce the optimization error.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+2. High Generalization Error: Generalization error refers to the difference between the training error and the test error. A high generalization error indicates that while the model performs well on the training data, it performs poorly on unseen test data, suggesting overfitting.
+To reduce it we can use regularization techniques like L1, L2, dropout, etc,
+that can help to reduce the model complexity and prevent overfitting.
+Another option is to use early stopping, that can help to stop the training when the validation error is not improving,
+and therefore prevent overfitting.
+Moreover we can use data augmentation techniques, that increasing the size of the training set,
+or batch normalization, that can help to stabilize the training process.
+We have learned them both in lectures 4-5, and they both can improve the generalization.  
+In CNNs we can increase the receptive field, that allows the model to capture more context 
+and improve its ability to generalize. Another option is to use techniques like max pooling, or mean pooling, 
+that can help to reduce the spatial dimension of the input, and therefore reduce the model complexity and prevent overfitting.
+ 
+3. High Approximation Error: Approximation error occurs when the chosen model or hypothesis class is too simple to capture the relationships in the data. This suggets underfitting.
+To reduce it we can use a more complex model, like a deeper model,
+or different architecture, like CNN, RNN, etc, that can help to learn more complex patterns.
+Moreover, we can use a different activation function, like ReLU, LeakyReLU, etc, that can help to learn more complex patterns.
+In addition, we can use a different optimizer, like Adam, RMSprop, etc, that can help to learn more complex patterns.
+Other option is to use boosting techniques, like AdaBoost, Gradient Boosting, etc, that can help to learn more complex patterns. 
+In CNNs we can increase the receptive field, that allows the model to capture more context
+and improve its ability to generalize.
 
 """
 
 part3_q2 = r"""
 **Your answer:**
 
+Scenario: COVID-19 Screening Test
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+High False Positive Rate:
+- In an area where COVID-19 prevalence is low, a high FPR means that many people who do not have COVID-19 are being
+incorrectly classified as positive by the screening test.
+- Reasons for a high FPR could include:
+    - Inaccurate test results due to very sensitivity test that trying to ensure no cases are missed.
+    - Precautionary principle, where the test is designed to be overly cautious to avoid missing any cases.
+    - Incorrect interpretation of test results due to human error.
+
+High False Negative Rate:
+- In an area where COVID-19 prevalence is high, a high FNR means that many people who have COVID-19 are being
+incorrectly classified as negative by the screening test.
+- Reasons for a high FNR could include:
+    - Speed over accuracy, where the test is designed to be fast and easy to administer, but may miss some cases.
+    - Inaccurate test results due to low sensitivity test.
+    - Inadequate sample collection or handling leading to false negatives.
+    - Limited resources or testing capacity leading to false negatives.
 
 """
 
 part3_q3 = r"""
 **Your answer:**
 
+1. Since the disease will eventually show non-lethal symptoms leading to diagnosis and treatment,
+the goal is to avoid unnecessary expensive and risky tests for healthy patients.
+This means accepting a higher rate of false negatives because these cases will be caught later when symptoms develop.
+Therefore, we need a high threshold where the true positive rate (TPR) is reasonable and the false positive rate (FPR) is low.
+This will ensure that the test is not overly sensitive and does not produce too many false positives.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+2. Missing a diagnosis can be fatal, so the model must be highly sensitive to ensure early detection.
+False positives, while costly and risky, are preferable to missing cases that could result in death.
+Therefore, we need a low threshold where the TPR is high even if the FPR is high.
+This will ensure that the test is highly sensitive and does not miss any cases, even if it produces many false positives.
 
 """
 
@@ -258,13 +346,17 @@ An equation: $e^{i\pi} -1 = 0$
 part3_q4 = r"""
 **Your answer:**
 
+MLP might not be the best choice for train on sequential data because:
+- MLPs treat each input independently and do not inherently capture the sequential nature of the data.
+In the case of text, where the order of words is crucial for understanding the meaning and context,
+an MLP does not account for the relationships between words across different positions in the sequence.
+- MLPs have a fixed input size, which can be problematic for sequences of varying lengths.
+For example, in the case of text, sentences can have different lengths, and an MLP would require padding or truncating
+to fit all inputs to a fixed size.
+- MLPs do not have memory, so they cannot remember past inputs or context from previous time steps. This is crucial for
+sequential data where the current output depends on previous inputs. For example, in language modeling, the prediction
+of the next word depends on the words that came before it.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
 
 """
 # ==============
@@ -283,22 +375,58 @@ def part4_optim_hp():
     #    What you returns needs to be a callable, so either an instance of one of the
     #    Loss classes in torch.nn or one of the loss functions from torch.nn.functional.
     # ====== YOUR CODE: ======
-    raise NotImplementedError()
+    loss_fn = torch.nn.CrossEntropyLoss()
+    lr = 0.001
+    weight_decay = 0
+    momentum = 0.99
     # ========================
     return dict(lr=lr, weight_decay=weight_decay, momentum=momentum, loss_fn=loss_fn)
 
 
 part4_q1 = r"""
-**Your answer:**
+*Your answer:*
 
+1. As we learned in the lecture, the number of parameter is determine by the following formula:
+$N_{\text{parameters}} = (F \cdot F \cdot K + 1)\cdot L)$
+where:
+- $F$ is the size of the filter.
+- $K$ is the number of input channels.
+- $L$ is the number of output channels.
++1 because the bias is counted as a parameter.
+Therefore, the number of parameters in the first layer is:
+    - So if we have two convolutional layers with 3x3 kernel, 256 input channel and 256 output channel, the number of parameters is: 
+    $N_{\text{parameters}} = (3 \cdot 3 \cdot 256 + 1) \cdot 256) + (3 \cdot 3 \cdot 256 + 1) \cdot 256) = 1,180,160$
+    - on the other hand, if we 256 input channel and 256 output channel, and we use in bottleneck layer 1x1 kernel,
+    to reduce to a layer of 64 output channel, then making 3x3 kernel to 64 output channel, and then 1x1 kernel to 256 output channel,
+    the number of parameters is:
+    $N_{\text{parameters}} = (1 \cdot 1 \cdot 256 + 1) \cdot 64) + (3 \cdot 3 \cdot 64 + 1) \cdot 64) + (1 \cdot 1 \cdot 64 + 1) \cdot 256) = 70,400$
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+2. The Number of floating point operations required to compute an output of a convolutional layer is determined by the following formula:
+$FLOPs = (F \cdot F \cdot K \cdot L \cdot H \cdot W)$
+where:
+- $F$ is the size of the filter.
+- $K$ is the number of input channels.
+- $L$ is the number of output channels.
+- $H$ is the height of the input.
+- $W$ is the width of the input.
+Therefore, the number of FLOPs in the first layer is:
+    - So if we have two convolutional layers with 3x3 kernel, 256 input channel and 256 output channel, and the input image is HxW,
+    the number of FLOPs is: $FLOPs = (3 \cdot 3 \cdot 256 \cdot 256 \cdot H \cdot W) + (3 \cdot 3 \cdot 256 \cdot 256 \cdot H \cdot W) = 1,572,864 \cdot H \cdot W$
+    - on the other hand, if we 256 input channel and 256 output channel, and we use in bottleneck layer 1x1 kernel,
+    to reduce to a layer of 64 output channel, then making 3x3 kernel to 64 output channel, and then 1x1 kernel to 256 output channel,
+    the number of FLOPs is: $FLOPs = (1 \cdot 1 \cdot 256 \cdot 64 \cdot H \cdot W) + (3 \cdot 3 \cdot 64 \cdot 64 \cdot H \cdot W) + (1 \cdot 1 \cdot 64 \cdot 256 \cdot H \cdot W) = 1,179,648 \cdot H \cdot W$
 
+3. $Regular Block:$
+
+$Spatially:$ Both convolutions are 3x3, so each can combine information from a 3x3 neighborhood, enhancing spatial feature extraction across multiple layers (the receptive field is larger allowing for better spatial feature extraction).
+
+$Across Feature Maps:$ Both 3x3 convolutions maintain the full 256-channel depth throughout the block. This means that each convolution can combine information from all input channels, preserving and enhancing channel relationships. Each output channel is influenced by 256 input channels.
+
+$Bottleneck Block:$
+
+$Spatially:$ The 1x1 convolutions before and after the 3x3 convolution do not contribute to spatial feature extraction (smaller effective receptive field), as they only operate on individual pixels.
+
+$Across Feature Maps:$ The sequence in the block enables flexible feature map integration: initially, feature reduction concentrates on key features, the 3x3 convolution spatially combines them, and the final expansion enhances different channel relationships.
 """
 
 # ==============
@@ -309,7 +437,7 @@ An equation: $e^{i\pi} -1 = 0$
 
 part5_q1 = r"""
 **Your answer:**
-
+5.1
 
 Write your answer using **markdown** and $\LaTeX$:
 ```python
