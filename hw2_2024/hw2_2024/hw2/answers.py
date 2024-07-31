@@ -92,11 +92,11 @@ def part2_optim_hp():
     # You may want to use different learning rates for each optimizer.
     # ====== YOUR CODE: ======
     # TODO - compare with friends
-    wstd = 0.1
-    lr_vanilla = 0.05
-    lr_momentum = 0.005
-    lr_rmsprop = 0.00016
-    reg = 0.004
+    wstd = 0.001
+    lr_vanilla = 0.02
+    lr_momentum = 0.5
+    lr_rmsprop = 0.0002
+    reg = 0.001
     # ========================
     return dict(
         wstd=wstd,
@@ -115,8 +115,8 @@ def part2_dropout_hp():
     # TODO: Tweak the hyperparameters to get the model to overfit without
     # dropout.
     # ====== YOUR CODE: ======
-    wstd = 0.1
-    lr = 0.001
+    wstd = 0.001
+    lr = 0.01
     # ========================
     return dict(wstd=wstd, lr=lr)
 
@@ -438,52 +438,46 @@ $Across Feature Maps:$ The sequence in the block enables flexible feature map in
 part5_q1 = r"""
 **Your answer:**
 5.1
+1. Deeper networks can learn more complex and abstract representations of the input data, resulting in better accuracy.
+On the other hand deeper networks are also harder to train due to various reasons such as prone to overfitting, longer training times and vanishing/ exploding gradients.
+In experiment 1.1, the model with depth=4 performed the best overall. This is probably due to the fact that the model with depth=4 had a good tradeoff between the ability to learn more complex features, and was not too deep to suffer from overfitting or vanishing gradients.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+2. Yes, the network of L=16 were not trainable. This is possibly due to exploding/vanishing gradients. We can resolve this problem partially by:
 
+   a) Employing advanced weight initialization methods  to ensure that the initial weights are set in a way that mitigates the vanishing/exploding gradient problem.
+   
+   b) Incorporating Batch Normalization layers in the network can reduce co-variate shift, stabilize training, and accelerate the process by normalizing the inputs to each layer and maintaining a consistent distribution of activations.
 """
 
 part5_q2 = r"""
 **Your answer:**
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+We used most of the same settings, but change the pooling kernel size according to the different depths.
+From the graphs we observed that for shallower depths (smaller L's) the convergence was faster, while for narrower networks (for a fixed depth) the convergence was longer.
+We can see from the different depths that as the depth increased we got better test accuracy, and compared to experiment 1.1 we got the best accuracy for L=8 rather than L=4.
+This Means that with the configuration in this experiment, and the wider network we used was able to capture more complex features.
 
 """
 
 part5_q3 = r"""
 **Your answer:**
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+We used pooling kernel size that was efficient for shallow networks like previous experiments.
+Similar to the previous experiments, the shallower networks converged faster than the deeper ones.
+We can see that the test accuracy of the deeper networks is higher than the shallower ones, but the accuracy of all the depth is similar (75%-80%).
+An interesting observation is that adding more filters didin't improve the test accuracy significantly compared to other experiments.
 
 """
 
 part5_q4 = r"""
 **Your answer:**
 
+We can see in this experiment that for L=16 the network is trainable, while in experiment 1.1 it wasn't.
+This is probably due to the fact that in this experiment we used the resnet model - meaning we added skip connections.
+We can conclude that by using the resnet model, we can train deeper networks and thus maybe capture more complex features.
+Also, we can conclude from the graphs in this experiment that the depth and the width of the network had pretty much the same effect on the test accuracy (although the different results on the train set).
+Lastly, while comparing the results of this experiments to the results in experiment 1.3 we can see that adding more filters did improve the test accuaracy.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
 
 """
 
@@ -497,53 +491,56 @@ An equation: $e^{i\pi} -1 = 0$
 part6_q1 = r"""
 **Your answer:**
 
+1.
+In the first picture, the model correctly identified all objects with accurate boundaries but failed to categorize them properly.
+In the second picture, the detection quality was lower, merging multiple objects (such as a cat and a dog) into one.
+However, the categorization was somtimes correct.
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+2.
+Possible reasons for the poor performance of the model:
+- The model may not have been trained on a sufficiently diverse or large dataset, leading to poor generalization to new images.
+- The dataset might be imbalanced, with some classes underrepresented.
+- The architecture or hyperparameters used might not be optimal for the given task.
+Possible methods that can help to resolve the poor performance:
+- Collect more labeled data, especially for underrepresented classes.
+- Ensure an even distribution of all classes in the training data.
+- Experiment with different architectures and hyperparameters to find the best-performing model configuration (as we did in the experiments).
 
-"""
+3.
+To attack YOLO using the PGD method, we create small changes in the input image that reduce the model's accuracy. 
+This involves calculating the gradient of the loss function with respect to the image and adding noise in the direction of the gradient, while keeping the changes small enough to be unnoticeable but still effective in confusing the model.
 
 
-part6_q2 = r"""
-**Your answer:**
-
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
 
 """
 
 
 part6_q3 = r"""
 **Your answer:**
+Image 1:
+The model does not detect correctly the ducks, it detects multiple ducks together as a fire hydrant.
+The models accuracy for the detection is 68%.
+The pitfall that is causing the model to detect the ducks as a fire hydrant is probably due to the fact that the ducks are aligned some are partially hidden by others, causing the model to miss important features.
+Meaning the model is encountering the occlusion pitfall.
+
+Image 2:
+The model does not identify the man riding the bicycle. The pitfall that the model is encountering is blurring, meaning the objects are in motion and appear blurry.
+Therefor the model does not detect any object in the picture.
+
+Image 3:
+The model does not identify the dog correctly in the picture, it actually detects the dog as a cow.
+This is because the model is encountering the textured background pitfall, meaning the model has trouble identifies the object due to the background.
 
 
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
 
 """
 
 part6_bonus = r"""
 **Your answer:**
 
-
-Write your answer using **markdown** and $\LaTeX$:
-```python
-# A code block
-a = 2
-```
-An equation: $e^{i\pi} -1 = 0$
+Image 3:
+With the removal of the background, and coloring it as white, the model was able to detect the dog correctly.
+This is because the textured background pitfall was removed, and the model was able to focus on the object itself.
+The model's accuracy for the detection was 100%.
 
 """

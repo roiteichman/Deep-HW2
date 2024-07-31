@@ -74,14 +74,12 @@ def cnn_experiment(
     activation_type="relu",
     activation_params={},
     pooling_type="max",
+    pooling_kernel_size=3,
     batchnorm=True,
     dropout=0.0,
     bottleneck=False,
     kernel_size=3,
     padding=1,
-    stride=1,
-    pooling_kernel_size=2,
-    pooling_stride=2,
     ** kw,
 ):
     """
@@ -118,28 +116,22 @@ def cnn_experiment(
     #   for you automatically.
     fit_res = None
     # ====== YOUR CODE: ======
-    conv_params = {'kernel_size': kernel_size, 'padding': padding, 'stride': stride}
-    pooling_params = {'kernel_size': pooling_kernel_size, 'stride': pooling_stride}
+    conv_params = {'kernel_size': kernel_size, 'padding': padding}
+    pooling_params = {'kernel_size': pooling_kernel_size}
     kwargs = {}
     # channels =[channel for channel in filters_per_layer for _ in range(layers_per_block)],
-    # if model_cls == ResNet:
-    #     kwargs = {'batchnorm': batchnorm,
-    #                          'dropout': dropout,
-    #                          'bottleneck': bottleneck}
+    if model_cls == ResNet:
+        kwargs = {'batchnorm': batchnorm,
+                             'dropout': dropout,
+                             'bottleneck': bottleneck}
     x, _ = ds_train[0]
     in_size = x.shape
 
-    lists_of_channels = []
-    for f in filters_per_layer:
-        lists_of_channels.append([f] * layers_per_block)
-    flattened_channels = []
-    for channel_list in lists_of_channels:
-        for item in channel_list:
-            flattened_channels.append(item)
+    list_channels = [f for f in filters_per_layer for _ in range(layers_per_block)]
 
     model = model_cls(in_size=in_size,
                       out_classes=10,
-                      channels=flattened_channels,
+                      channels=list_channels,
                       pool_every=pool_every,
                       hidden_dims=hidden_dims,
                       conv_params=conv_params,
@@ -158,8 +150,7 @@ def cnn_experiment(
     test_loader = DataLoader(ds_test, batch_size=bs_test, shuffle=False)
 
     fit_res = trainer.fit(
-        train_loader, test_loader, num_epochs=epochs, early_stopping=early_stopping, checkpoints=checkpoints,
-        max_batches=batches, print_every=3)
+        train_loader, test_loader, num_epochs=epochs, early_stopping=early_stopping, checkpoints=checkpoints)
     # ========================
 
     save_experiment(run_name, out_dir, cfg, fit_res)
