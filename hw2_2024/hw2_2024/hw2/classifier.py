@@ -22,7 +22,7 @@ class Classifier(nn.Module, ABC):
 
         # Add any additional initializations here, if you need them.
         # ====== YOUR CODE: ======
-        self.softmax = torch.softmax(dim=1)
+        # no need for additional initializations
         # ========================
 
     def forward(self, x: Tensor) -> Tensor:
@@ -59,7 +59,7 @@ class Classifier(nn.Module, ABC):
         """
         # Calculate class probabilities for the input.
         # ====== YOUR CODE: ======
-        y_proba = self.softmax(z)
+        y_proba = torch.softmax(z, dim=1)
         return y_proba
         # ========================
 

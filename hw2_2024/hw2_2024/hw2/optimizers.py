@@ -92,8 +92,7 @@ class MomentumSGD(Optimizer):
 
         # Add your own initializations as needed.
         # ====== YOUR CODE: ======
-        # self.velocities = {p: torch.zeros_like(p) for p, dp in self.params if dp is not None}
-        self.velocities = {id(p): torch.zeros_like(p) for p, dp in self.params if dp is not None}
+        self.velocities = {p: torch.zeros_like(p) for p, dp in self.params if dp is not None}
         # ========================
 
     def step(self):
@@ -106,7 +105,7 @@ class MomentumSGD(Optimizer):
             # update the parameters tensor based on the velocity. Don't forget
             # to include the regularization term.
             # ====== YOUR CODE: ======
-            v = self.velocities[id(p)]
+            v = self.velocities[p]
             v = self.momentum * v + (1 - self.momentum) * dp
             dp += self.reg * p
             p -= self.learn_rate * v
@@ -130,7 +129,7 @@ class RMSProp(Optimizer):
 
         # Add your own initializations as needed.
         # ====== YOUR CODE: ======
-        self.sq_grads = {id(p):torch.zeros_like(p) for p, dp in self.params if dp is not None}
+        self.sq_grads = {p:torch.zeros_like(p) for p, dp in self.params if dp is not None}
         # ========================
 
     def step(self):
@@ -143,9 +142,9 @@ class RMSProp(Optimizer):
             # average of it's previous gradients. Use it to update the
             # parameters tensor.
             # ====== YOUR CODE: ======
-            reg_dp = self.reg * p + dp
-            previous_grad = self.sq_grads[id(p)]
-            new_grad = self.decay * previous_grad + (1 - self.decay) * reg_dp ** 2
-            self.sq_grads[id(p)] = new_grad
-            p -= (self.learn_rate / torch.sqrt(new_grad + self.eps)) * reg_dp
+            reg_dp = p * self.reg + dp
+            previous_grad = self.sq_grads[p]
+            curr_gra = self.decay * previous_grad + (1 - self.decay) * reg_dp ** 2
+            self.sq_grads[p] = curr_gra
+            p -= (self.learn_rate / torch.sqrt(curr_gra + self.eps)) * reg_dp
             # ========================

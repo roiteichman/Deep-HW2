@@ -150,7 +150,8 @@ def cnn_experiment(
     test_loader = DataLoader(ds_test, batch_size=bs_test, shuffle=False)
 
     fit_res = trainer.fit(
-        train_loader, test_loader, num_epochs=epochs, early_stopping=early_stopping, checkpoints=checkpoints)
+        train_loader, test_loader, num_epochs=epochs,
+        early_stopping=early_stopping, checkpoints=checkpoints, max_batches=batches)
     # ========================
 
     save_experiment(run_name, out_dir, cfg, fit_res)
