@@ -93,8 +93,8 @@ def part2_optim_hp():
     # ====== YOUR CODE: ======
     wstd = 0.001
     lr_vanilla = 0.02
-    lr_momentum = 0.35
-    lr_rmsprop = 0.00019
+    lr_momentum = 0.45
+    lr_rmsprop = 0.0002
     reg = 0.0018
     # ========================
     return dict(
@@ -123,12 +123,13 @@ def part2_dropout_hp():
 part2_q1 = r"""
 **Your answer:**
 
-1. According to the graphs we can see that the dropout improve the test accuracy and reduce the overfitting as we expected.
-we can see that the test loss of dropout=0 is increasing from Iteration=15 while the dropout=0.4 and dropout=0.8 are decreasing.
-moreover the test accuracy of the dropout=0.4 and dropout=0.8 are higher than the dropout=0. 
+1. According to the graphs we can see that on the training set, the model without dropout has lower training loss and higher training accuracy.
+but, it preform worse on the test data due to overfitting.
+It matches our expectations because the dropout is a regularization technique that helps to prevent overfitting by randomly setting some of the neurons to zero during training.
+This technique reduces the model's reliance on specific neurons and prevents it from memorizing the training data, and helps it to improve the generalization.
 
-2. We can see that the dropout=0.4 is better than the dropout=0.8 because the dropout=0.8 is too high and the model is
-not learning enough, because it is underfitting.
+2. We can see that the dropout=0.4 is better than the dropout=0.8 on the training set as well as on the test set.
+That's because the dropout=0.8 is too high and the model is not learning enough, because it is underfitting.
 """
 
 part2_q2 = r"""
