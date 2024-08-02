@@ -93,9 +93,9 @@ def part2_optim_hp():
     # ====== YOUR CODE: ======
     wstd = 0.001
     lr_vanilla = 0.02
-    lr_momentum = 0.45
-    lr_rmsprop = 0.0002
-    reg = 0.0018
+    lr_momentum = 0.35
+    lr_rmsprop = 0.00019
+    reg = 0.0019
     # ========================
     return dict(
         wstd=wstd,
@@ -416,17 +416,13 @@ Therefore, the number of FLOPs in the first layer is:
     to reduce to a layer of 64 output channel, then making 3x3 kernel to 64 output channel, and then 1x1 kernel to 256 output channel,
     the number of FLOPs is: $FLOPs = (1 \cdot 1 \cdot 256 \cdot 64 \cdot H \cdot W) + (3 \cdot 3 \cdot 64 \cdot 64 \cdot H \cdot W) + (1 \cdot 1 \cdot 64 \cdot 256 \cdot H \cdot W) = 1,179,648 \cdot H \cdot W$
 
-3. $Regular Block:$
-
-$Spatially:$ Both convolutions are 3x3, so each can combine information from a 3x3 neighborhood, enhancing spatial feature extraction across multiple layers (the receptive field is larger allowing for better spatial feature extraction).
-
-$Across Feature Maps:$ Both 3x3 convolutions maintain the full 256-channel depth throughout the block. This means that each convolution can combine information from all input channels, preserving and enhancing channel relationships. Each output channel is influenced by 256 input channels.
-
-$Bottleneck Block:$
-
-$Spatially:$ The 1x1 convolutions before and after the 3x3 convolution do not contribute to spatial feature extraction (smaller effective receptive field), as they only operate on individual pixels.
-
-$Across Feature Maps:$ The sequence in the block enables flexible feature map integration: initially, feature reduction concentrates on key features, the 3x3 convolution spatially combines them, and the final expansion enhances different channel relationships.
+3. 
+- $Regular Block:$
+    - $Spatially:$ Both convolutions are 3x3, so each can combine information from a 3x3 neighborhood, enhancing spatial feature extraction across multiple layers (the receptive field is larger allowing for better spatial feature extraction).
+    - $Across Feature Maps:$ Both 3x3 convolutions maintain the full 256-channel depth throughout the block. This means that each convolution can combine information from all input channels, preserving and enhancing channel relationships. Each output channel is influenced by 256 input channels.
+- $Bottleneck Block:$
+    - $Spatially:$ The 1x1 convolutions before and after the 3x3 convolution do not contribute to spatial feature extraction (smaller effective receptive field), as they only operate on individual pixels.
+    - $Across Feature Maps:$ The sequence in the block enables flexible feature map integration: initially, feature reduction concentrates on key features, the 3x3 convolution spatially combines them, and the final expansion enhances different channel relationships.
 """
 
 # ==============
@@ -524,8 +520,8 @@ The pitfall that is causing the model to detect the ducks as a fire hydrant is p
 Meaning the model is encountering the occlusion pitfall.
 
 Image 2:
-The model does not identify the man riding the bicycle. The pitfall that the model is encountering is blurring, meaning the objects are in motion and appear blurry.
-Therefor the model does not detect any object in the picture.
+The model identifies the man but does not identify the bicycle. The pitfall that the model is encountering is blurring, meaning the objects are in motion and appear blurry.
+Therefore the model does not detect all of the objects in the picture.
 
 Image 3:
 The model does not identify the dog correctly in the picture, it actually detects the dog as a cow.
